@@ -129,7 +129,7 @@ namespace UniversalGrid.Geometry
 
             Positions = Positions.Select(p => p.Translate(vector)).ToList();
 
-            var ev2 = BeforeMoved;
+            var ev2 = Moved;
 
             if (ev2 != null) ev2.Invoke(this, new Point2DEventArgs(vector));
         }
