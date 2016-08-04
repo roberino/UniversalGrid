@@ -42,14 +42,21 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Drawing\Colour.cs" />
+    <Compile Include="Events\IEventDispatcher.cs" />
     <Compile Include="Events\ObjectEvent.cs" />
+    <Compile Include="Geometry\Direction.cs" />
     <Compile Include="Geometry\Extensions.cs" />
     <Compile Include="Geometry\ISpatial2D.cs" />
+    <Compile Include="Geometry\ISpatial2DThing.cs" />
     <Compile Include="Geometry\ObjectOutOfBoundsException.cs" />
     <Compile Include="Geometry\Point2D.cs" />
+    <Compile Include="Geometry\Point2DEqualityComparer.cs" />
     <Compile Include="Geometry\Point2DEventArgs.cs" />
     <Compile Include="Geometry\Rectangle.cs" />
     <Compile Include="Geometry\Spatial2DThing.cs" />
+    <Compile Include="Rules\ISpatialRule.cs" />
+    <Compile Include="Rules\TypedSpatialRule.cs" />
+    <Compile Include="Rules\RuleViolationEvent.cs" />
     <Compile Include="UniversalGrid.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

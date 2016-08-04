@@ -6,6 +6,10 @@ namespace UniversalGrid.Geometry
 {
     public class Rectangle : ISpatial2D
     {
+        public Rectangle(int x, int y, int width, int height) : this(new Point2D() { X = x, Y = y }, width, height)
+        {
+        }
+
         public Rectangle(Point2D topLeft, int width, int height)
         {
             Width = width;
@@ -39,6 +43,11 @@ namespace UniversalGrid.Geometry
             }
         }
 
+        public bool Overlaps(IEnumerable<Point2D> positions)
+        {
+            return positions.Any(p => Overlaps(p));
+        }
+
         public bool Overlaps(Point2D position)
         {
             return position.X >= TopLeft.X && position.Y >= TopLeft.Y && position.X <= BottomRight.X && position.Y <= BottomRight.Y;
@@ -54,9 +63,11 @@ namespace UniversalGrid.Geometry
             return spatial.Positions.All(p => Overlaps(p));
         }
 
-        public void Move(Point2D vector)
+        public virtual bool Move(Point2D vector)
         {
             TopLeft = TopLeft.Translate(vector);
+
+            return true;
         }
     }
 }

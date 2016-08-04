@@ -46,6 +46,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Geometry\Point2DTests.cs" />
+    <Compile Include="Geometry\RectangleTests.cs" />
     <Compile Include="Geometry\Spatial2DThingTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UniversalGridTests.cs" />

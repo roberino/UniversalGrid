@@ -7,6 +7,37 @@ namespace UniversalGrid.Tests.Geometry
     public class Spatial2DThingTests
     {
         [Test]
+        public void IsWithin_Rectange_ReturnsTrueFor1x1ObjectWithinRect()
+        {
+            var rect = new Rectangle(0, 0, 5, 5);
+
+            var thing = "A".AsSpatialObject(2, 2);
+
+            Assert.That(thing.IsWithin(rect));
+        }
+
+        [Test]
+        public void IsWithin_Rectange_ReturnsFalseFor1x1ObjectOutsideRect()
+        {
+            var rect = new Rectangle(0, 0, 5, 5);
+
+            var thing = "A".AsSpatialObject(20, 2);
+
+            Assert.That(thing.IsWithin(rect), Is.False);
+        }
+
+        [Test]
+        public void IsWithin_Rectange_ReturnsFalseFor1x2ObjectPartiallyOutsideRect()
+        {
+            var rect = new Rectangle(0, 0, 5, 5);
+
+            var thing = "A".AsSpatialObject(4, 2, new Point2D() { X = 6, Y = 6 });
+
+            Assert.That(thing.IsWithin(rect), Is.False);
+            Assert.That(thing.Overlaps(rect), Is.True);
+        }
+
+        [Test]
         public void Equals_ReturnsTrueForObjectsOfEquivPositionAndData()
         {
             var thing1 = new Spatial2DThing<string>(new[] { new Point2D() { X = 1, Y = 2 } });

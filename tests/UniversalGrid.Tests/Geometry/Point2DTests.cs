@@ -31,24 +31,35 @@ namespace UniversalGrid.Tests.Geometry
             Assert.That(point2.Equals(point3), Is.False);
         }
 
-        [Test]
-        public void Rotate_Example1()
+        [TestCase(5, 6, -8, 7)]
+        [TestCase(2, 2, -3, 3)]
+        public void Rotate_Example1(int x, int y, int x1, int y1)
         {
             var point1 = new Point2D()
             {
-                X = 5,
-                Y = 6
+                X = x,
+                Y = y
             };
 
-            var origin = new Point2D()
-            {
-                X = 3,
-                Y = 3
-            };
+            var rotated = point1.Rotate();
 
-            var rotated = point1.Rotate(origin);
+            Assert.That(rotated.X, Is.EqualTo(x1));
+            Assert.That(rotated.Y, Is.EqualTo(y1));
+        }
 
-            Assert.That(rotated.X > 0);
+        [Test]
+        public void GetHashCode_ReturnsValidResults()
+        {
+            var point1 = new Point2D() { X = 1, Y = 1 };
+            var point2 = new Point2D();
+            var point3 = new Point2D();
+            var point4 = new Point2D() { X = 2, Y = 1 };
+            var point5 = new Point2D() { X = 2, Y = 1 };
+
+            Assert.That(point1.GetHashCode(), Is.EqualTo(point1.GetHashCode()));
+            Assert.That(point2.GetHashCode(), Is.EqualTo(point3.GetHashCode()));
+            Assert.That(point4.GetHashCode(), Is.EqualTo(point5.GetHashCode()));
+            Assert.That(point1.GetHashCode(), Is.Not.EqualTo(point5.GetHashCode()));
         }
     }
 }

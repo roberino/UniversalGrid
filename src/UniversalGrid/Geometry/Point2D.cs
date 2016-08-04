@@ -43,11 +43,15 @@ namespace UniversalGrid.Geometry
         /// <param name="vector">A vector specifying the X and Y direction</param>
         public Point2D Translate(Point2D vector)
         {
-            return new Point2D()
-            {
-                 X = X + vector.X,
-                 Y = Y + vector.Y
-            };
+            return this + vector;
+        }
+
+        /// <summary>
+        /// Rotates a point, returning a new point
+        /// </summary>
+        public Point2D Rotate(int angle = 90)
+        {
+            return Rotate(new Point2D(), angle);
         }
 
         /// <summary>
@@ -58,13 +62,53 @@ namespace UniversalGrid.Geometry
             var s = Math.Sin(angle);
             var c = Math.Cos(angle);
 
-            return new Point2D
+            //p'x = cos(theta) * (px-ox) - sin(theta) * (py-oy) + ox
+            //p'y = sin(theta) * (px-ox) + cos(theta) * (py-oy) + oy
+
+            var n = new Point2D
             {
-                X = (int)(origin.X * c - origin.Y * s),
-                Y = (int)(origin.X * s + origin.Y * c)
+                X = (int)Math.Round((c * (X - origin.X) - s * (Y - origin.Y) + origin.X), 0),
+                Y = (int)Math.Round((s * (X - origin.X) - c * (Y - origin.Y) + origin.Y), 0),
+            };
+
+            return n;
+        }
+
+        public static Point2D operator +(Point2D p1, Point2D p2)
+        {
+            return new Point2D()
+            {
+                X = p1.X + p2.X,
+                Y = p1.Y + p2.Y
             };
         }
 
+        public static Point2D operator -(Point2D p1, Point2D p2)
+        {
+            return new Point2D()
+            {
+                X = p1.X - p2.X,
+                Y = p1.Y - p2.Y
+            };
+        }
+
+        public static Point2D operator *(Point2D p1, Point2D p2)
+        {
+            return new Point2D()
+            {
+                X = p1.X * p2.X,
+                Y = p1.Y * p2.Y
+            };
+        }
+
+        public static Point2D operator /(Point2D p1, Point2D p2)
+        {
+            return new Point2D()
+            {
+                X = p1.X / p2.X,
+                Y = p1.Y / p2.Y
+            };
+        }
         public override bool Equals(object obj)
         {
             if(obj is Point2D)

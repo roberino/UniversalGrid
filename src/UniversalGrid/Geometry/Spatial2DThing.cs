@@ -8,7 +8,7 @@ using UniversalGrid.Events;
 
 namespace UniversalGrid.Geometry
 {
-    public class Spatial2DThing<T> : ISpatial2D, IEquatable<Spatial2DThing<T>>
+    public class Spatial2DThing<T> : ISpatial2DThing<T>
     {
         private T _data;
 
@@ -57,6 +57,19 @@ namespace UniversalGrid.Geometry
 
         public event EventHandler<Point2DEventArgs> Moved;
 
+        public Point2D Centre
+        {
+            get
+            {
+                var mx = Positions.Min(p => p.X);
+                var my = Positions.Min(p => p.Y);
+                var x = mx + (Positions.Max(p => p.X) - mx) / 2;
+                var y= my + (Positions.Max(p => p.Y) - my) / 2;
+
+                return new Point2D() { X = x, Y = y };
+            }
+        }
+
         public Point2D TopLeft
         {
             get
@@ -97,7 +110,7 @@ namespace UniversalGrid.Geometry
             return Equals(obj as Spatial2DThing<T>);
         }
 
-        public bool Equals(Spatial2DThing<T> other)
+        public bool Equals(ISpatial2DThing<T> other)
         {
             if (other == null) return false;
 
@@ -121,17 +134,85 @@ namespace UniversalGrid.Geometry
             return comp ^ (_data.GetHashCode() * 7);
         }
 
-        public void Move(Point2D vector)
+        public bool Rotate(Point2D? origin = null, int angle = 90)
         {
+            var o = origin.GetValueOrDefault(Centre);
+
+            var newPos = Positions.Select(p => p.Rotate(o, angle)).ToList();
+
             var ev = BeforeMoved;
 
-            if (ev != null) ev.Invoke(this, new Point2DEventArgs(vector));
+            var eva = new Point2DEventArgs(newPos);
+            if (ev != null) ev.Invoke(this, eva);
 
-            Positions = Positions.Select(p => p.Translate(vector)).ToList();
+            if (eva.Abort) return false;
+
+            Positions = newPos;
 
             var ev2 = Moved;
 
-            if (ev2 != null) ev2.Invoke(this, new Point2DEventArgs(vector));
+            if (ev2 != null) ev2.Invoke(this, eva);
+
+            return true;
+        }
+
+        /// <summary>
+        /// Moves in the specified direction by the specified amount
+        /// </summary>
+        public void Move(Direction direction, int amount = 1)
+        {
+            switch (direction)
+            {
+                case Direction.Up:
+                    Move(0, -amount);
+                    break;
+                case Direction.Down:
+                    Move(0, amount);
+                    break;
+                case Direction.Left:
+                    Move(-amount, 0);
+                    break;
+                case Direction.Right:
+                    Move(amount, 0);
+                    break;
+            }
+        }
+
+        /// <summary>
+        /// Moves the thing in the direction of the specified x and y coordinates
+        /// </summary>
+        public void Move(int x, int y)
+        {
+            Move(new Point2D() { X = x, Y = y });
+        }
+
+        /// <summary>
+        /// Moves the thing in the direction of the specified vector
+        /// </summary>
+        public bool Move(Point2D vector)
+        {
+            var newPos = Positions.Select(p => p.Translate(vector)).ToList();
+            var ev = BeforeMoved;
+
+            var eva = new Point2DEventArgs(newPos);
+            if (ev != null) ev.Invoke(this, eva);
+
+            if (eva.Abort) return false;
+
+            Positions = newPos;
+
+            var ev2 = Moved;
+
+            if (ev2 != null) ev2.Invoke(this, new Point2DEventArgs(newPos));
+
+            return true;
+        }
+
+        public bool Overlaps(IEnumerable<Point2D> positions)
+        {
+            var overlapping = Positions.Intersect(positions, Point2DEqualityComparer.Comparer).ToList();
+
+            return overlapping.Any();
         }
 
         public bool Overlaps(Point2D position)
@@ -141,12 +222,17 @@ namespace UniversalGrid.Geometry
 
         public bool Overlaps(ISpatial2D spatial)
         {
-            return (Positions.Intersect(spatial.Positions).Any());
+            return Overlaps(spatial.Positions);
         }
 
+        /// <summary>
+        /// Returns true if this object is wholely within the bounds of the other spatial object
+        /// </summary>
         public bool IsWithin(ISpatial2D spatial)
         {
-            return (Positions.Except(spatial.Positions).Any());
+            //TODO: Could be optimised for simple shapes
+
+            return !(Positions.Except(spatial.Positions).Any());
         }
 
         private void FireModifiedEvent()
