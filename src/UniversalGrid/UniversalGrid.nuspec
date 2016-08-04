@@ -6,10 +6,10 @@
 		<title>UniversalGrid</title>
 		<authors>R Eyres</authors>
 		<owners>R Eyres</owners>
-		<description>A simple, stand-alone library for managing objects within a grid-like layout</description> 
+		<description>A simple, stand-alone library for managing objects within a 2 dimensional grid</description> 
 		<projectUrl>https://github.com/roberino/UniversalGrid</projectUrl>
 		<licenseUrl>https://opensource.org/licenses/MIT</licenseUrl>
-		<tags>grid collections</tags>
+		<tags>grid collections cartesian coordinates spatial</tags>
 		<language>en-UK</language>
 	</metadata>
 </package>
