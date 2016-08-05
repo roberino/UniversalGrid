@@ -159,31 +159,29 @@ namespace UniversalGrid.Geometry
         /// <summary>
         /// Moves in the specified direction by the specified amount
         /// </summary>
-        public void Move(Direction direction, int amount = 1)
+        public bool Move(Direction direction, int amount = 1)
         {
             switch (direction)
             {
                 case Direction.Up:
-                    Move(0, -amount);
-                    break;
+                    return Move(0, -amount);
                 case Direction.Down:
-                    Move(0, amount);
-                    break;
+                    return Move(0, amount);
                 case Direction.Left:
-                    Move(-amount, 0);
-                    break;
+                    return Move(-amount, 0);
                 case Direction.Right:
-                    Move(amount, 0);
-                    break;
+                    return Move(amount, 0);
             }
+
+            return false;
         }
 
         /// <summary>
         /// Moves the thing in the direction of the specified x and y coordinates
         /// </summary>
-        public void Move(int x, int y)
+        public bool Move(int x, int y)
         {
-            Move(new Point2D() { X = x, Y = y });
+            return Move(new Point2D() { X = x, Y = y });
         }
 
         /// <summary>

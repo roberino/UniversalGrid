@@ -17,7 +17,7 @@ The grid publishes a number of events to notify consumers of changes within.
 
 ## Examples
 
-### Basic usuage
+### Basic usage
 
 ```cs
 

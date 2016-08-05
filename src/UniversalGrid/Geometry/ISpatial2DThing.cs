@@ -15,8 +15,8 @@ namespace UniversalGrid.Geometry
         event EventHandler<ObjectEvent<T>> Modified;
         event EventHandler<Point2DEventArgs> Moved;
         event EventHandler SelectionChanged;
-        void Move(int x, int y);
-        void Move(Direction direction, int amount = 1);
+        bool Move(int x, int y);
+        bool Move(Direction direction, int amount = 1);
         bool Rotate(Point2D? origin = null, int angle = 90);
     }
 }
