@@ -23,7 +23,7 @@ namespace UniversalGrid.Tests
         }
 
         [Test]
-        public void SetObject_AtZero_FiredItemAddedEvent()
+        public void SetObject_AtZero_FiredItemAddedAndModifiedEvent()
         {
             var grid = new UniversalGrid<string>(10, 20);
 
@@ -37,8 +37,16 @@ namespace UniversalGrid.Tests
                 evFired = true;
             };
 
+            var modified = false;
+
+            grid.Modified += (s, e) =>
+            {
+                modified = true;
+            };
+
             grid.SetObject(thing1);
 
+            Assert.That(modified);
             Assert.That(evFired);
         }
 
@@ -156,6 +164,30 @@ namespace UniversalGrid.Tests
         }
 
         [Test]
+        public void Move_InvokesAction()
+        {
+            var grid = new UniversalGrid<string>(3, 3);
+
+            var thing1 = "A".AsSpatialObject(1, 1);
+
+            bool actionInvoked = false;
+
+            grid.AddAction((x, m) => m.Any(p => p.Y > 2), (g, x) => {
+                actionInvoked = true;
+            }); // Add a rule which prevents Y from exceeding 2
+
+            grid.SetObject(thing1);
+
+            thing1.Move(Direction.Down);
+
+            Assert.That(actionInvoked, Is.False);
+
+            thing1.Move(Direction.Down);
+
+            Assert.That(actionInvoked, Is.True);
+        }
+
+        [Test]
         public void Move_CorrectlySetsTopLeftPosAndMovesContainingObjects()
         {
             var grid = new UniversalGrid<string>(10, 20);
@@ -163,16 +195,23 @@ namespace UniversalGrid.Tests
             var thing1 = "A".AsSpatialObject(1, 1);
             var thing2 = "B".AsSpatialObject(1, 2);
             var moves = 0;
+            var modified = false;
 
             grid.ItemMoved += (s, e) =>
             {
                 moves++;
             };
 
+            grid.Modified += (s, e) =>
+            {
+                modified = true;
+            };
+
             grid.SetObjects(thing1, thing2);
 
             grid.Move(new Point2D() { X = 2, Y = 1 });
-            
+
+            Assert.That(modified);
             Assert.That(grid.TopLeft, Is.EqualTo(new Point2D() { X = 2, Y = 1 }));
             Assert.That(grid.AllObjects.Count(), Is.EqualTo(2));
             Assert.That(thing1.TopLeft, Is.EqualTo(new Point2D() { X = 3, Y = 2 }));

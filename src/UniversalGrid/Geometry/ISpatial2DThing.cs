@@ -10,11 +10,13 @@ namespace UniversalGrid.Geometry
         T Data { get; set; }
         string Label { get; set; }
         bool Selected { get; set; }
+        Point2D RotationalCentre { get; set; }
 
         event EventHandler<Point2DEventArgs> BeforeMoved;
         event EventHandler<ObjectEvent<T>> Modified;
         event EventHandler<Point2DEventArgs> Moved;
         event EventHandler SelectionChanged;
+
         bool Move(int x, int y);
         bool Move(Direction direction, int amount = 1);
         bool Rotate(Point2D? origin = null, int angle = 90);

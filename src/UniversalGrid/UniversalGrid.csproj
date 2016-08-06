@@ -53,8 +53,10 @@
     <Compile Include="Geometry\Point2DEqualityComparer.cs" />
     <Compile Include="Geometry\Point2DEventArgs.cs" />
     <Compile Include="Geometry\Rectangle.cs" />
+    <Compile Include="Geometry\RoundingMethod.cs" />
     <Compile Include="Geometry\Spatial2DThing.cs" />
     <Compile Include="Rules\ISpatialRule.cs" />
+    <Compile Include="Rules\RuleAction.cs" />
     <Compile Include="Rules\TypedSpatialRule.cs" />
     <Compile Include="Rules\RuleViolationEvent.cs" />
     <Compile Include="UniversalGrid.cs" />

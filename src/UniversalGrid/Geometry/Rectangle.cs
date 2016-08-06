@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace UniversalGrid.Geometry
 {
-    public class Rectangle : ISpatial2D
+    public class Rectangle : ISpatial2D, IEquatable<Rectangle>
     {
         public Rectangle(int x, int y, int width, int height) : this(new Point2D() { X = x, Y = y }, width, height)
         {
@@ -68,6 +68,25 @@ namespace UniversalGrid.Geometry
             TopLeft = TopLeft.Translate(vector);
 
             return true;
+        }
+
+        public virtual bool Equals(Rectangle other)
+        {
+            if (other == null) return false;
+
+            if (ReferenceEquals(this, other)) return true;
+
+            return (other.TopLeft.Equals(TopLeft) && other.Width == Width && other.Height == Height);
+        }
+
+        public override bool Equals(object obj)
+        {
+            return Equals(obj as Rectangle);
+        }
+
+        public override int GetHashCode()
+        {
+            return new Tuple<int, int, int, int>(Width, Height, TopLeft.X, TopLeft.Y).GetHashCode();
         }
     }
 }

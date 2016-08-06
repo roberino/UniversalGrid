@@ -67,12 +67,22 @@ namespace UniversalGrid.Geometry
 
             var n = new Point2D
             {
-                X = (int)Math.Round((c * (X - origin.X) - s * (Y - origin.Y) + origin.X), 0),
-                Y = (int)Math.Round((s * (X - origin.X) - c * (Y - origin.Y) + origin.Y), 0),
+                X = Round((c * (X - origin.X) - s * (Y - origin.Y) + origin.X)),
+                Y = Round((s * (X - origin.X) - c * (Y - origin.Y) + origin.Y)),
             };
 
             return n;
         }
+
+        private int Round(double x)
+        {
+            if(RoundingMethod == RoundingMethod.Truncate)
+                return (int)Math.Truncate(x);
+
+            return (int)Math.Round(x, 0);
+        }
+
+        public static RoundingMethod RoundingMethod { get; set; } = RoundingMethod.Truncate;
 
         public static Point2D operator +(Point2D p1, Point2D p2)
         {

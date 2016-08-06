@@ -18,6 +18,7 @@ namespace UniversalGrid
         private readonly ReaderWriterLockSlim _rwLock;
         private readonly IDictionary<Point2D, IList<ISpatial2DThing<T>>> _items;
         private readonly IDictionary<int, ISpatialRule> _movementRules;
+        private readonly IDictionary<int, RuleAction<UniversalGrid<T>>> _actions;
         private Rectangle _viewPort;
 
         /// <summary>
@@ -30,6 +31,7 @@ namespace UniversalGrid
             _rwLock = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
             _items = new Dictionary<Point2D, IList<ISpatial2DThing<T>>>();
             _movementRules = new Dictionary<int, ISpatialRule>();
+            _actions = new Dictionary<int, RuleAction<UniversalGrid<T>>>();
             _viewPort = new Rectangle(TopLeft, width, height);
         }
 
@@ -45,7 +47,13 @@ namespace UniversalGrid
             set
             {
                 Contract.Assert(value != null);
-                _viewPort = value;
+
+                if (!_viewPort.Equals(value))
+                {
+                    _viewPort = value;
+
+                    FireModified();
+                }
             }
         }
 
@@ -53,6 +61,8 @@ namespace UniversalGrid
         /// When set to true, objects can overlap each other
         /// </summary>
         public bool AllowOverlapping { get; set; }
+
+        public event EventHandler Modified;
 
         /// <summary>
         /// Fires when a new item is added
@@ -122,12 +132,30 @@ namespace UniversalGrid
         /// <param name="condition">A predicate function which takes a 
         /// thing and a proposed move as arguments and returns a boolean value.
         /// The rule will fire (will be violated) if the condition returns true</param>
-        public void AddMovementRule<R>(Func<ISpatial2D, IEnumerable<Point2D>, bool> condition, R type, int? id)
+        /// <param name="id">An optional id assigned to the rul</param>
+        /// <param name="type">Type type of rule</param>
+        public void AddMovementRule<R>(Func<ISpatial2D, IEnumerable<Point2D>, bool> condition, R type = default(R), int? id = null)
         {
             Write(() =>
             {
                 var idv = id.HasValue ? id.Value : (_movementRules.Any() ? _movementRules.Max(r => r.Value.Id) + 1 : 1);
                 _movementRules[idv] = new TypedSpatialRule<R>(idv, type, condition);
+            });
+        }
+
+        /// <summary>
+        /// Adds an action which will be execute before an object is moved when the condition is met
+        /// </summary>
+        /// <param name="condition">A predicate function which takes a 
+        /// thing and a proposed move as arguments and returns a boolean value.
+        /// The rule will fire (will be violated) if the condition returns true</param>
+        /// <param name="action">An action which will be invoked when the condition is met</param>
+        public void AddAction(Func<ISpatial2D, IEnumerable<Point2D>, bool> condition, Action<UniversalGrid<T>, ISpatial2D> action, int? id = null)
+        {
+            Write(() =>
+            {
+                var idv = id.HasValue ? id.Value : (_actions.Any() ? _actions.Max(r => r.Value.Id) + 1 : 1);
+                _actions[idv] = new RuleAction<UniversalGrid<T>>(idv, action, condition);
             });
         }
 
@@ -295,6 +323,8 @@ namespace UniversalGrid
                 {
                     ev.Invoke(this, new ObjectEvent<ISpatial2DThing<T>>(thing));
                 }
+
+                FireModified();
             }
 
             return found;
@@ -344,6 +374,8 @@ namespace UniversalGrid
                 {
                     ev.Invoke(this, new ObjectEvent<ISpatial2DThing<T>>(thing));
                 }
+
+                FireModified();
             }
         }
 
@@ -373,6 +405,13 @@ namespace UniversalGrid
 
                 ev(this, new RuleViolationEvent(rule, thing));
             }
+
+            var actions = _actions.Values.Where(r => r.Condition(thing, e.Points)).ToList();
+
+            foreach (var action in actions)
+            {
+                action.RuleType.Invoke(this, thing);
+            }
         }
 
         private void ThingMovedEventHandler(object s, Point2DEventArgs e)
@@ -391,6 +430,18 @@ namespace UniversalGrid
             if (ev != null)
             {
                 ev.Invoke(this, new ObjectEvent<ISpatial2DThing<T>>(item));
+            }
+
+            FireModified();
+        }
+
+        private void FireModified()
+        {
+            var ev = Modified;
+
+            if (ev != null)
+            {
+                ev.Invoke(this, EventArgs.Empty);
             }
         }
 

@@ -11,14 +11,14 @@ namespace UniversalGrid.Geometry
     public class Spatial2DThing<T> : ISpatial2DThing<T>
     {
         private T _data;
-
         private bool _selected;
+        private Point2D? _rotationalCentre;
 
         public Spatial2DThing(IEnumerable<Point2D> positions)
         {
             Contract.Assert(positions.Any());
 
-            Positions = positions.OrderByDescending(p => p.Y).ThenByDescending(p => p.X).ToList();
+            Positions = positions.OrderBy(p => p.Y).ThenBy(p => p.X).ToList();
         }
 
         public Spatial2DThing(Point2D position)
@@ -56,6 +56,18 @@ namespace UniversalGrid.Geometry
         public event EventHandler<Point2DEventArgs> BeforeMoved;
 
         public event EventHandler<Point2DEventArgs> Moved;
+
+        public Point2D RotationalCentre
+        {
+            get
+            {
+                return _rotationalCentre.GetValueOrDefault(Centre);
+            }
+            set
+            {
+                _rotationalCentre = value;
+            }
+        }
 
         public Point2D Centre
         {
@@ -136,7 +148,7 @@ namespace UniversalGrid.Geometry
 
         public bool Rotate(Point2D? origin = null, int angle = 90)
         {
-            var o = origin.GetValueOrDefault(Centre);
+            var o = origin.GetValueOrDefault(RotationalCentre);
 
             var newPos = Positions.Select(p => p.Rotate(o, angle)).ToList();
 
@@ -152,6 +164,25 @@ namespace UniversalGrid.Geometry
             var ev2 = Moved;
 
             if (ev2 != null) ev2.Invoke(this, eva);
+
+            return true;
+        }
+
+        public bool Modify(IEnumerable<Point2D> newPosition)
+        {
+            if (!(Positions.Except(newPosition).Any() || newPosition.Except(Positions).Any())) return false;
+            var ev = BeforeMoved;
+
+            var eva = new Point2DEventArgs(newPosition);
+            if (ev != null) ev.Invoke(this, eva);
+
+            if (eva.Abort) return false;
+
+            Positions = newPosition;
+
+            var ev2 = Moved;
+
+            if (ev2 != null) ev2.Invoke(this, new Point2DEventArgs(newPosition));
 
             return true;
         }
@@ -202,6 +233,11 @@ namespace UniversalGrid.Geometry
             var ev2 = Moved;
 
             if (ev2 != null) ev2.Invoke(this, new Point2DEventArgs(newPos));
+
+            if (_rotationalCentre.HasValue)
+            {
+                _rotationalCentre = _rotationalCentre.Value.Translate(vector);
+            }
 
             return true;
         }

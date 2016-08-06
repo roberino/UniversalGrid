@@ -6,6 +6,12 @@ namespace UniversalGrid.Tests.Geometry
     [TestFixture]
     public class Point2DTests
     {
+        [OneTimeSetUp]
+        public void Setup()
+        {
+            Point2D.RoundingMethod = RoundingMethod.Round;
+        }
+
         [Test]
         public void Equals_ReturnsCorrectBehaviour()
         {
