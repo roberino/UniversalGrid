@@ -10,20 +10,19 @@ namespace UniversalGrid.Tests.Geometry
         [Test]
         public void SetRotationalCentre_And_Rotate_BehavesAsExpected()
         {
-            Point2D.RoundingMethod = RoundingMethod.Truncate;
-
+            Point2D.RoundingMethod = RoundingMethod.Default;
 
             var thing = "A".AsSpatialObject(0, 0, new Point2D[] { new Point2D() { X = 0, Y = 1 }, new Point2D() { X = 0, Y = 2 } });
 
-            thing.RotationalCentre = new Point2D();
+            thing.RotationalCentre = new Point2D() { Y = 1 };
 
             Assert.That(thing.RotationalCentre.X, Is.EqualTo(0));
-            Assert.That(thing.RotationalCentre.Y, Is.EqualTo(0));
+            Assert.That(thing.RotationalCentre.Y, Is.EqualTo(1));
 
             thing.Move(Direction.Right, 5);
 
             Assert.That(thing.RotationalCentre.X, Is.EqualTo(5));
-            Assert.That(thing.RotationalCentre.Y, Is.EqualTo(0));
+            Assert.That(thing.RotationalCentre.Y, Is.EqualTo(1));
 
             // (0, 0) -> (5, 0)
             // (0, 1) -> (5, 1)
@@ -31,16 +30,67 @@ namespace UniversalGrid.Tests.Geometry
 
             thing.Rotate();
 
-            // (5, 0) -> (5, 0)
-            // (5, 1) -> (4, 0)
-            // (5, 2) -> (3, 0)
+            // (5, 0) -> (6, 1)
+            // (5, 1) -> (5, 1)
+            // (5, 2) -> (4, 1)
+
+            Assert.That(thing.Positions.ElementAt(0).X, Is.EqualTo(6));
+            Assert.That(thing.Positions.ElementAt(0).Y, Is.EqualTo(1));
+            Assert.That(thing.Positions.ElementAt(1).X, Is.EqualTo(5));
+            Assert.That(thing.Positions.ElementAt(1).Y, Is.EqualTo(1));
+            Assert.That(thing.Positions.ElementAt(2).X, Is.EqualTo(4));
+            Assert.That(thing.Positions.ElementAt(2).Y, Is.EqualTo(1));
+            
+            thing.Rotate();
+
+            // (6, 0) -> (5, 0)
+            // (5, 0) -> (5, 1)
+            // (4, 0) -> (5, 2)
 
             Assert.That(thing.Positions.ElementAt(0).X, Is.EqualTo(5));
-            Assert.That(thing.Positions.ElementAt(0).Y, Is.EqualTo(0));
-            Assert.That(thing.Positions.ElementAt(1).X, Is.EqualTo(4));
-            Assert.That(thing.Positions.ElementAt(1).Y, Is.EqualTo(0));
-            Assert.That(thing.Positions.ElementAt(2).X, Is.EqualTo(3));
+            Assert.That(thing.Positions.ElementAt(0).Y, Is.EqualTo(2));
+            Assert.That(thing.Positions.ElementAt(1).X, Is.EqualTo(5));
+            Assert.That(thing.Positions.ElementAt(1).Y, Is.EqualTo(1));
+            Assert.That(thing.Positions.ElementAt(2).X, Is.EqualTo(5));
             Assert.That(thing.Positions.ElementAt(2).Y, Is.EqualTo(0));
+        }
+
+        [Test]
+        public void SetRotationalCentre_And_Rotate2_BehavesAsExpected()
+        {
+            Point2D.RoundingMethod = RoundingMethod.Default;
+
+            var thing = "A".AsSpatialObject(0, 0, new Point2D[] { new Point2D() { X = 0, Y = 1 }, new Point2D() { X = 0, Y = 2 }, new Point2D() { X = 0, Y = 3 } });
+
+            thing.RotationalCentre = new Point2D() { Y = 1 };
+
+            Assert.That(thing.RotationalCentre.X, Is.EqualTo(0));
+            Assert.That(thing.RotationalCentre.Y, Is.EqualTo(1));
+
+            thing.Move(Direction.Right, 5);
+
+            Assert.That(thing.RotationalCentre.X, Is.EqualTo(5));
+            Assert.That(thing.RotationalCentre.Y, Is.EqualTo(1));
+            //Assert.That(thing.RotationalCentre.OffsetY);
+
+            // (0, 0) -> (5, 0)
+            // (0, 1) -> (5, 1)
+            // (0, 2) -> (5, 2)
+
+            thing.Rotate();
+
+            // (5, 0) -> (6, 1)
+            // (5, 1) -> (5, 1)
+            // (5, 2) -> (4, 1)
+
+            Assert.That(thing.Positions.ElementAt(0).X, Is.EqualTo(6));
+            Assert.That(thing.Positions.ElementAt(0).Y, Is.EqualTo(1));
+            Assert.That(thing.Positions.ElementAt(1).X, Is.EqualTo(5));
+            Assert.That(thing.Positions.ElementAt(1).Y, Is.EqualTo(1));
+            Assert.That(thing.Positions.ElementAt(2).X, Is.EqualTo(4));
+            Assert.That(thing.Positions.ElementAt(2).Y, Is.EqualTo(1));
+            Assert.That(thing.Positions.ElementAt(3).X, Is.EqualTo(3));
+            Assert.That(thing.Positions.ElementAt(3).Y, Is.EqualTo(1));
         }
 
         [Test]

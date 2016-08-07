@@ -9,7 +9,7 @@ namespace UniversalGrid.Tests.Geometry
         [OneTimeSetUp]
         public void Setup()
         {
-            Point2D.RoundingMethod = RoundingMethod.Round;
+            Point2D.RoundingMethod = RoundingMethod.Default;
         }
 
         [Test]
@@ -37,8 +37,7 @@ namespace UniversalGrid.Tests.Geometry
             Assert.That(point2.Equals(point3), Is.False);
         }
 
-        [TestCase(5, 6, -8, 7)]
-        [TestCase(2, 2, -3, 3)]
+        [TestCase(2, 2, -2, 2)]
         public void Rotate_Example1(int x, int y, int x1, int y1)
         {
             var point1 = new Point2D()
