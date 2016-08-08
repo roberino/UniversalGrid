@@ -41,9 +41,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Drawing\Colour.cs" />
+    <Compile Include="Formatting\Colour.cs" />
     <Compile Include="Events\IEventDispatcher.cs" />
     <Compile Include="Events\ObjectEvent.cs" />
+    <Compile Include="Formatting\Extensions.cs" />
+    <Compile Include="Formatting\GridWriter.cs" />
+    <Compile Include="Formatting\CsvFormatter.cs" />
+    <Compile Include="Formatting\HtmlFormatter.cs" />
+    <Compile Include="Formatting\ITextFormatter.cs" />
     <Compile Include="Geometry\Direction.cs" />
     <Compile Include="Geometry\Extensions.cs" />
     <Compile Include="Geometry\ISpatial2D.cs" />

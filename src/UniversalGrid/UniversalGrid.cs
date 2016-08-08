@@ -133,14 +133,39 @@ namespace UniversalGrid
         /// thing and a proposed move as arguments and returns a boolean value.
         /// The rule will fire (will be violated) if the condition returns true</param>
         /// <param name="id">An optional id assigned to the rul</param>
-        /// <param name="type">Type type of rule</param>
-        public void AddMovementRule<R>(Func<ISpatial2D, IEnumerable<Point2D>, bool> condition, R type = default(R), int? id = null)
+        public ISpatialRule AddMovementRule(Func<ISpatial2D, IEnumerable<Point2D>, bool> condition)
         {
+            ISpatialRule rule = null;
+
+            Write(() =>
+            {
+                var idv = _movementRules.Any() ? _movementRules.Max(r => r.Value.Id) + 1 : 1;
+
+                _movementRules[idv] = rule = new TypedSpatialRule<byte>(idv, 0, condition);
+            });
+
+            return rule;
+        }
+
+        /// <summary>
+        /// Adds a (type specific) rule which will be execute before an object is moved
+        /// </summary>
+        /// <param name="condition">A predicate function which takes a 
+        /// thing and a proposed move as arguments and returns a boolean value.
+        /// The rule will fire (will be violated) if the condition returns true</param>
+        /// <param name="id">An optional id assigned to the rul</param>
+        /// <param name="type">The type of rule</param>
+        public ISpatialRule AddMovementRule<R>(Func<ISpatial2D, IEnumerable<Point2D>, bool> condition, R type = default(R), int? id = null)
+        {
+            ISpatialRule rule = null;
+
             Write(() =>
             {
                 var idv = id.HasValue ? id.Value : (_movementRules.Any() ? _movementRules.Max(r => r.Value.Id) + 1 : 1);
-                _movementRules[idv] = new TypedSpatialRule<R>(idv, type, condition);
+                _movementRules[idv] = rule = new TypedSpatialRule<R>(idv, type, condition);
             });
+
+            return rule;
         }
 
         /// <summary>
@@ -341,7 +366,7 @@ namespace UniversalGrid
                     _items[thing.TopLeft] = items = new List<ISpatial2DThing<T>>();
                 }
 
-                if (!Overlaps(thing))
+                if (!thing.IsWithin(this))
                 {
                     throw new ObjectOutOfBoundsException(thing);
                 }

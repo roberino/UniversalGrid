@@ -45,6 +45,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Formatting\ColourTests.cs" />
+    <Compile Include="Formatting\ExtensionsTests.cs" />
     <Compile Include="Geometry\Point2DTests.cs" />
     <Compile Include="Geometry\RectangleTests.cs" />
     <Compile Include="Geometry\Spatial2DThingTests.cs" />

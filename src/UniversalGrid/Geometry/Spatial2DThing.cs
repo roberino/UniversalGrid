@@ -260,13 +260,13 @@ namespace UniversalGrid.Geometry
         }
 
         /// <summary>
-        /// Returns true if this object is wholely within the bounds of the other spatial object
+        /// Returns true if this object is wholely within the bounds of the other object
         /// </summary>
         public bool IsWithin(ISpatial2D spatial)
         {
-            //TODO: Could be optimised for simple shapes
+            //TODO: Could be optimised for simple shapes?
 
-            return !(Positions.Except(spatial.Positions).Any());
+            return Positions.All(p => spatial.Overlaps(p));
         }
 
         private void FireModifiedEvent()

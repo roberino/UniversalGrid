@@ -9,6 +9,9 @@ namespace UniversalGrid.Geometry
             Object = spacialObject;
         }
 
+        /// <summary>
+        /// The target object
+        /// </summary>
         public ISpatial2D Object { get; private set; }
     }
 }

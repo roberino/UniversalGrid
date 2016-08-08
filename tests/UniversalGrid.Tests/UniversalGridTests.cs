@@ -10,11 +10,15 @@ namespace UniversalGrid.Tests
     public class UniversalGridTests
     {
         [Test]
-        public void CreateInstance_IsCorrectlyInitialised()
+        public void CreateInstance_InitialisesAsExpected()
         {
             var grid = new UniversalGrid<string>(10, 20);
 
             Assert.That(grid.Rows.Count(), Is.EqualTo(20));
+            Assert.That(grid.Rows.First().First().X, Is.EqualTo(0));
+            Assert.That(grid.Rows.Last().Last().X, Is.EqualTo(9));
+            Assert.That(grid.Rows.First().First().Y, Is.EqualTo(0));
+            Assert.That(grid.Rows.Last().Last().Y, Is.EqualTo(19));
             Assert.That(grid.Rows.All(r => r.Count() == 10));
             Assert.That(grid.Height, Is.EqualTo(20));
             Assert.That(grid.Width, Is.EqualTo(10));
@@ -128,10 +132,35 @@ namespace UniversalGrid.Tests
 
             grid.SetObject(thing1);
 
-            thing1.Move(Direction.Down);
-            thing1.Move(Direction.Down);
+            thing1.Move(Direction.Down); // 1, 2
 
-            Assert.Throws<ObjectOutOfBoundsException>(() => thing1.Move(Direction.Down));
+            Assert.Throws<ObjectOutOfBoundsException>(() => thing1.Move(Direction.Down)); // 1, 3
+        }
+
+        [Test]
+        public void Move_NonTypes_RuleViolation_RaisesEvent()
+        {
+            var grid = new UniversalGrid<string>(3, 3);
+
+            var thing1 = "A".AsSpatialObject(1, 1);
+
+            var rule = grid.AddMovementRule((x, m) => m.Any(p => p.Y > 1)); // Add a rule which prevents Y from exceeding 2
+
+            bool wasExecuted = false;
+
+            grid.RuleViolated += (s, e) =>
+            {
+                wasExecuted = true;
+
+                Assert.That(e.Rule, Is.SameAs(rule));
+            };
+
+            grid.SetObject(thing1);
+
+            thing1.Move(Direction.Down); // try to move => 1, 2
+
+            Assert.That(rule.Id == 1);
+            Assert.That(wasExecuted);
         }
 
         [Test]
@@ -148,17 +177,18 @@ namespace UniversalGrid.Tests
                 rule = e.Rule;
             };
 
-            grid.AddMovementRule((x, m) => m.Any(p => p.Y > 2), 1, 23); // Add a rule which prevents Y from exceeding 2
+            grid.AddMovementRule((x, m) => m.Any(p => p.Y > 1), 1, 23); // Add a rule which prevents Y from exceeding 2
 
             grid.SetObject(thing1);
 
-            thing1.Move(Direction.Down);
+            thing1.Move(Direction.Right); // 2, 1
 
             Assert.That(rule == null);
 
-            thing1.Move(Direction.Down);
+            thing1.Move(Direction.Down); // try to move => 2, 2
 
-            Assert.That(thing1.TopLeft.Y, Is.EqualTo(2), "The value should remain unchanged");
+            Assert.That(thing1.TopLeft.Y, Is.EqualTo(1), "The Y value should remain unchanged");
+            Assert.That(thing1.TopLeft.X, Is.EqualTo(2), "The X value should remain unchanged");
 
             Assert.That(rule.Id == 23);
         }
@@ -172,17 +202,17 @@ namespace UniversalGrid.Tests
 
             bool actionInvoked = false;
 
-            grid.AddAction((x, m) => m.Any(p => p.Y > 2), (g, x) => {
+            grid.AddAction((x, m) => m.Any(p => p.Y > 1), (g, x) => {
                 actionInvoked = true;
             }); // Add a rule which prevents Y from exceeding 2
 
             grid.SetObject(thing1);
 
-            thing1.Move(Direction.Down);
+            thing1.Move(Direction.Right); // 2, 1
 
             Assert.That(actionInvoked, Is.False);
 
-            thing1.Move(Direction.Down);
+            thing1.Move(Direction.Down); // 2, 2 
 
             Assert.That(actionInvoked, Is.True);
         }
@@ -228,7 +258,9 @@ namespace UniversalGrid.Tests
 
             item.Label = "X";
 
-            RenderToConsole(grid);
+            var cellCount = RenderToConsole(grid);
+
+            Assert.That(cellCount, Is.EqualTo(100));
         }
 
         [Test]
@@ -246,17 +278,22 @@ namespace UniversalGrid.Tests
 
             item.Rotate();
             
-            RenderToConsole(grid);
+            var cellCount = RenderToConsole(grid);
+
+            Assert.That(cellCount, Is.EqualTo(100));
         }
 
-        private void RenderToConsole(UniversalGrid<int> grid)
+        private int RenderToConsole(UniversalGrid<int> grid)
         {
             Console.WriteLine();
 
+            int c = 0;
             var r = -1;
 
             grid.Render((p, m) =>
             {
+                c++;
+
                 if (p.Y > r)
                 {
                     Console.WriteLine();
@@ -279,6 +316,8 @@ namespace UniversalGrid.Tests
             });
 
             Console.WriteLine();
+
+            return c;
         }
     }
 }
