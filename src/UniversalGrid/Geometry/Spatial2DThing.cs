@@ -69,6 +69,28 @@ namespace UniversalGrid.Geometry
             }
         }
 
+        public int Width
+        {
+            get
+            {
+                var x0 = Positions.Min(p => p.X);
+                var x1 = Positions.Max(p => p.X);
+
+                return x1 - x0;
+            }
+        }
+
+        public int Height
+        {
+            get
+            {
+                var y0 = Positions.Min(p => p.Y);
+                var y1 = Positions.Max(p => p.Y);
+
+                return y1 - y0;
+            }
+        }
+
         public Point2D Centre
         {
             get

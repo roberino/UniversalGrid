@@ -144,7 +144,7 @@ namespace UniversalGrid.Tests
 
             var thing1 = "A".AsSpatialObject(1, 1);
 
-            var rule = grid.AddMovementRule((x, m) => m.Any(p => p.Y > 1)); // Add a rule which prevents Y from exceeding 2
+            var rule = grid.AddConstraint((x, m) => m.Any(p => p.Y > 1)); // Add a rule which prevents Y from exceeding 2
 
             bool wasExecuted = false;
 
@@ -177,7 +177,7 @@ namespace UniversalGrid.Tests
                 rule = e.Rule;
             };
 
-            grid.AddMovementRule((x, m) => m.Any(p => p.Y > 1), 1, 23); // Add a rule which prevents Y from exceeding 2
+            grid.AddConstraint((x, m) => m.Any(p => p.Y > 1), 1, 23); // Add a rule which prevents Y from exceeding 2
 
             grid.SetObject(thing1);
 

@@ -5,11 +5,10 @@ namespace UniversalGrid.Formatting
 {
     public interface ITextFormatter<T>
     {
-        void WriteStartGrid();
+        void WriteStartGrid(IGridContainer<T> grid);
         void WriteEndGrid();
         void WriteStartRow(int rowIndex);
         void WriteEndRow();
-        void WriteEmptyCell(int cellIndex);
-        void WriteCell(int cellIndex, IEnumerable<ISpatial2DThing<T>> contents);
+        void WriteCell(Point2D cellPos, int cellIndex, IEnumerable<ISpatial2DThing<T>> contents);
     }
 }

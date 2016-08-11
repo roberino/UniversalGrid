@@ -15,7 +15,7 @@ namespace UniversalGrid.Rules
         int Id { get; }
 
         /// <summary>
-        /// Gets the condition that sets of the rule
+        /// Gets the condition that sets off the rule
         /// </summary>
         Func<ISpatial2D, IEnumerable<Point2D>, bool> Condition { get; }
     }

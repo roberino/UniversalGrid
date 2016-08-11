@@ -13,13 +13,15 @@ namespace UniversalGrid
     /// Represents a 2 dimensional grid which can hold "spatial" objects
     /// </summary>
     /// <typeparam name="T">The type of spatial objects which the grid can contain</typeparam>
-    public class UniversalGrid<T> : Rectangle
+    public class UniversalGrid<T> : Rectangle, IGridContainer<T>
     {
         private readonly ReaderWriterLockSlim _rwLock;
         private readonly IDictionary<Point2D, IList<ISpatial2DThing<T>>> _items;
         private readonly IDictionary<int, ISpatialRule> _movementRules;
         private readonly IDictionary<int, RuleAction<UniversalGrid<T>>> _actions;
         private Rectangle _viewPort;
+        private double _unitWidth;
+        private double _unitHeight;
 
         /// <summary>
         /// Creates a new grid, at point (0,0)
@@ -33,6 +35,44 @@ namespace UniversalGrid
             _movementRules = new Dictionary<int, ISpatialRule>();
             _actions = new Dictionary<int, RuleAction<UniversalGrid<T>>>();
             _viewPort = new Rectangle(TopLeft, width, height);
+            _unitWidth = 1;
+            _unitHeight = 1;
+        }
+
+        /// <summary>
+        /// Gets or sets the width of 1 unit of space within the grid
+        /// </summary>
+        public double UnitWidth
+        {
+            get { return _unitWidth; }
+            set
+            {
+                Contract.Assert(value > 0);
+
+                if (_unitWidth != value)
+                {
+                    _unitWidth = value;
+                    FireModified();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the height of 1 unit of space within the grid
+        /// </summary>
+        public double UnitHeight
+        {
+            get { return _unitHeight; }
+            set
+            {
+                Contract.Assert(value > 0);
+
+                if (_unitHeight != value)
+                {
+                    _unitHeight = value;
+                    FireModified();
+                }
+            }
         }
 
         /// <summary>
@@ -127,13 +167,13 @@ namespace UniversalGrid
         }
 
         /// <summary>
-        /// Adds a rule which will be execute before an object is moved
+        /// Adds a constraint which will be executed before an object is moved
         /// </summary>
         /// <param name="condition">A predicate function which takes a 
         /// thing and a proposed move as arguments and returns a boolean value.
         /// The rule will fire (will be violated) if the condition returns true</param>
         /// <param name="id">An optional id assigned to the rul</param>
-        public ISpatialRule AddMovementRule(Func<ISpatial2D, IEnumerable<Point2D>, bool> condition)
+        public ISpatialRule AddConstraint(Func<ISpatial2D, IEnumerable<Point2D>, bool> condition)
         {
             ISpatialRule rule = null;
 
@@ -148,14 +188,14 @@ namespace UniversalGrid
         }
 
         /// <summary>
-        /// Adds a (type specific) rule which will be execute before an object is moved
+        /// Adds a (type specific) constraint which will be executed before an object is moved
         /// </summary>
         /// <param name="condition">A predicate function which takes a 
         /// thing and a proposed move as arguments and returns a boolean value.
         /// The rule will fire (will be violated) if the condition returns true</param>
         /// <param name="id">An optional id assigned to the rul</param>
         /// <param name="type">The type of rule</param>
-        public ISpatialRule AddMovementRule<R>(Func<ISpatial2D, IEnumerable<Point2D>, bool> condition, R type = default(R), int? id = null)
+        public ISpatialRule AddConstraint<R>(Func<ISpatial2D, IEnumerable<Point2D>, bool> condition, R type = default(R), int? id = null)
         {
             ISpatialRule rule = null;
 

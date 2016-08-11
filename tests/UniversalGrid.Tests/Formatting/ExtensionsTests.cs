@@ -2,6 +2,7 @@
 using System;
 using System.Linq;
 using System.Xml.Linq;
+using UniversalGrid.Drawing;
 using UniversalGrid.Formatting;
 
 namespace UniversalGrid.Tests.Formatting
@@ -24,13 +25,53 @@ namespace UniversalGrid.Tests.Formatting
         }
 
         [Test]
+        public void ToXml_ReturnsValidXmlDoc()
+        {
+            var grid = new UniversalGrid<string>(10, 15);
+
+            grid.SetObject("X", 5, 5);
+
+            var xmlDoc = grid.ToXml();
+
+            Assert.That(xmlDoc.Root.Name.LocalName, Is.EqualTo("grid"));
+            Assert.That(xmlDoc.Root.Attribute("width").Value, Is.EqualTo("10"));
+            Assert.That(xmlDoc.Root.Attribute("height").Value, Is.EqualTo("15"));
+            Assert.That(xmlDoc.Root.Attribute("viewport").Value, Is.EqualTo("0 0 9 14"));
+            Assert.That(xmlDoc.Root.Elements().ElementAt(5).Elements().ElementAt(5).Value, Is.EqualTo("X"));
+
+            Console.WriteLine(xmlDoc);
+        }
+
+        [Test]
+        public void ToSvg_ReturnsValidSvgDoc()
+        {
+            var grid = new UniversalGrid<string>(10, 15)
+            {
+                UnitHeight = 50,
+                UnitWidth = 50
+            };
+
+            var obj = grid.SetObject("X", 5, 5);
+
+            obj.Colour = new Colour() { R = 255, A = 255 };
+            
+            var svgDoc = grid.ToSvg();
+
+            Assert.That(svgDoc.Root.Name.LocalName, Is.EqualTo("svg"));
+
+            svgDoc.Save(@"C:\stash\grid.svg");
+
+            Console.WriteLine(svgDoc);
+        }
+
+        [Test]
         public void ToHtml_ReturnsValidXhtmlTable()
         {
             var grid = new UniversalGrid<string>(10, 10);
 
             grid.SetObject("X", 5, 5);
 
-            var html = grid.ToHtml("tbl");
+            var html = grid.ToHtml(tableClass: "tbl");
 
             var htmlDoc = XDocument.Parse(html);
 

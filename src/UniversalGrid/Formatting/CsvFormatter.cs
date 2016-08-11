@@ -14,13 +14,13 @@ namespace UniversalGrid.Formatting
         {
             _output = output;
             _objectFormatter = objectFormatter;
-
+            
             Delimitter = _delimitter;
         }
 
         public char Delimitter { get; set; }
 
-        public void WriteStartGrid()
+        public void WriteStartGrid(IGridContainer<T> grid)
         {
         }
 
@@ -38,13 +38,7 @@ namespace UniversalGrid.Formatting
             _output.WriteLine();
         }
 
-        public void WriteEmptyCell(int cellIndex)
-        {
-            if (cellIndex > 0)
-                _output.Write(Delimitter);
-        }
-
-        public void WriteCell(int cellIndex, IEnumerable<ISpatial2DThing<T>> contents)
+        public void WriteCell(Point2D cellPos, int cellIndex, IEnumerable<ISpatial2DThing<T>> contents)
         {
             if (cellIndex > 0)
                 _output.Write(Delimitter);

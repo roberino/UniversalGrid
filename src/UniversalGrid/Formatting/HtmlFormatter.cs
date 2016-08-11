@@ -7,86 +7,45 @@ using UniversalGrid.Geometry;
 
 namespace UniversalGrid.Formatting
 {
-    public class HtmlFormatter<T> : ITextFormatter<T>
+    public class HtmlFormatter<T> : XmlFormatter<T>
     {
-        private readonly XmlWriter _output;
-        private readonly Func<T, string> _objectFormatter;
         private readonly string _className;
 
-        bool _dataWritten;
-
-        public HtmlFormatter(TextWriter output, Func<T, string> objectFormatter, string className = null)
+        public HtmlFormatter(TextWriter output, Func<T, string> objectFormatter, string className = null) : base(output, objectFormatter)
         {
-            _output = XmlWriter.Create(output, new XmlWriterSettings());
-            _objectFormatter = objectFormatter;
             _className = className;
             EmptyCellContents = ((char)160).ToString();
         }
 
-        public string EmptyCellContents { get; set; }
-
-        protected XmlWriter XmlWriter { get { return _output; } }
-
-        protected Func<T, string> ObjectFormatter { get { return _objectFormatter; } }
-
-        protected virtual void WriteStartElement(string name)
+        protected override void WriteStartRootDocument(IGridContainer<T> grid)
         {
-            _output.WriteStartElement(name);
-        }
-
-        protected virtual void WriteItem(ISpatial2DThing<T> item)
-        {
-            _output.WriteString(_objectFormatter.Invoke(item.Data));
-        }
-
-        public void WriteStartGrid()
-        {
-            if (!_dataWritten)
-            {
-                _output.WriteStartDocument();
-                _dataWritten = true;
-            }
-
-            WriteStartElement("table");
+            XmlWriter.WriteStartElement("table");
 
             if (!string.IsNullOrEmpty(_className))
             {
-                _output.WriteAttributeString("class", _className);
+                XmlWriter.WriteAttributeString("class", _className);
             }
         }
 
-        public void WriteEndGrid()
+        protected override void WriteStartCell()
         {
-            _output.WriteEndElement();
-            _output.Flush();
+            XmlWriter.WriteStartElement("td");
         }
 
-        public void WriteStartRow(int rowIndex)
+        public override void WriteStartRow(int rowIndex)
         {
             WriteStartElement("tr");
         }
 
-        public void WriteEndRow()
+        public override void WriteCell(Point2D cellPos, int cellIndex, IEnumerable<ISpatial2DThing<T>> contents)
         {
-            _output.WriteEndElement();
-        }
-
-        public virtual void WriteEmptyCell(int cellIndex)
-        {
-            WriteStartElement("td");
-            _output.WriteString(EmptyCellContents);
-            _output.WriteEndElement();
-        }
-
-        public virtual void WriteCell(int cellIndex, IEnumerable<ISpatial2DThing<T>> contents)
-        {
-            WriteStartElement("td");
+            WriteStartCell();
 
             ISpatial2DThing<T> last = contents.LastOrDefault();
 
             if (last != null && !last.Colour.IsTransparent)
             {
-                _output.WriteAttributeString("style", "color: " + last.Colour.ToHex());
+                XmlWriter.WriteAttributeString("style", "color: " + last.Colour.ToHex());
             }
 
             foreach (var item in contents)
@@ -94,7 +53,7 @@ namespace UniversalGrid.Formatting
                 WriteItem(item);
             }
 
-            _output.WriteEndElement();
+            XmlWriter.WriteEndElement();
         }
     }
 }
