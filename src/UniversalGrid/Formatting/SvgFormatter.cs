@@ -54,6 +54,11 @@ namespace UniversalGrid.Formatting
             {
                 WriteStartElement("g");
 
+                if (!string.IsNullOrEmpty(item.Id))
+                {
+                    XmlWriter.WriteAttributeString("id", item.Id);
+                }
+
                 var itemNode = ObjectFormatter.Invoke(item.Data);
 
                 foreach (var pos in item.Positions)

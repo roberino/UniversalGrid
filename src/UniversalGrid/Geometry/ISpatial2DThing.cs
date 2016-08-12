@@ -21,6 +21,11 @@ namespace UniversalGrid.Geometry
         T Data { get; set; }
 
         /// <summary>
+        /// Annotates the object with an id
+        /// </summary>
+        string Id { get; }
+
+        /// <summary>
         /// Annotates the object with a label
         /// </summary>
         string Label { get; set; }

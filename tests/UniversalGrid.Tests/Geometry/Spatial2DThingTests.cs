@@ -7,6 +7,7 @@ namespace UniversalGrid.Tests.Geometry
     [TestFixture]
     public class Spatial2DThingTests
     {
+
         [Test]
         public void SetRotationalCentre_And_Rotate_BehavesAsExpected()
         {
@@ -122,6 +123,25 @@ namespace UniversalGrid.Tests.Geometry
 
             Assert.That(thing.IsWithin(rect), Is.False);
             Assert.That(thing.Overlaps(rect), Is.True);
+        }
+
+        [Test]
+        public void Equals_ReturnsTrueForObjectsOfEquivPositionAndDataAndId()
+        {
+            var thing1 = (1).AsSpatialObject(3, 132, "id1");
+            var thing2 = (1).AsSpatialObject(3, 132, "id1");
+
+            Assert.That(thing1.Equals(thing2));
+        }
+
+
+        [Test]
+        public void Equals_ReturnsFalseForObjectsOfEquivPositionAndDataAndDifferentId()
+        {
+            var thing1 = (1).AsSpatialObject(3, 132, "id1");
+            var thing2 = (1).AsSpatialObject(3, 132, "id2");
+
+            Assert.That(thing1.Equals(thing2), Is.False);
         }
 
         [Test]

@@ -14,17 +14,20 @@ namespace UniversalGrid.Geometry
         private bool _selected;
         private Point2D? _rotationalCentre;
 
-        public Spatial2DThing(IEnumerable<Point2D> positions)
+        public Spatial2DThing(IEnumerable<Point2D> positions, string id = null)
         {
             Contract.Assert(positions.Any());
 
             Positions = positions.OrderBy(p => p.Y).ThenBy(p => p.X).ToList();
+
+            Id = id;
         }
 
-        public Spatial2DThing(Point2D position)
+        public Spatial2DThing(Point2D position) : this(new Point2D[] { position })
         {
-            Positions = new Point2D[] { position };
         }
+
+        public string Id { get; private set; }
 
         public string Label { get; set; }
 
@@ -153,6 +156,8 @@ namespace UniversalGrid.Geometry
             if (other.Data == null && Data != null) return false;
 
             if (!other.Data.Equals(Data)) return false;
+
+            if (!string.Equals(Id, other.Id)) return false;
 
             if (other.Positions.Count() != Positions.Count()) return false;
 

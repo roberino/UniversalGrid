@@ -48,6 +48,11 @@ namespace UniversalGrid.Formatting
                 XmlWriter.WriteAttributeString("style", "color: " + last.Colour.ToHex());
             }
 
+            if (contents.Count() == 1 && !string.IsNullOrEmpty(last.Id))
+            {
+                XmlWriter.WriteAttributeString("id", last.Id);
+            }
+
             foreach (var item in contents)
             {
                 WriteItem(item);
