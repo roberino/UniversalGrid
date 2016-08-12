@@ -37,6 +37,9 @@ namespace UniversalGrid.Formatting
             {
                 XmlWriter.WriteAttributeString("class", _className);
             }
+
+            XmlWriter.WriteAttributeString("width", (_unitWidth * grid.Width).ToString());
+            XmlWriter.WriteAttributeString("height", (_unitHeight * grid.Height).ToString());
         }
 
         public override void WriteStartRow(int rowIndex)

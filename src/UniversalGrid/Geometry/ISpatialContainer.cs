@@ -25,5 +25,6 @@ namespace UniversalGrid.Geometry
         void SetObjects(IEnumerable<ISpatial2DThing<T>> things);
 
         bool RemoveObject(ISpatial2DThing<T> thing);
+        bool Clear(Func<ISpatial2DThing<T>, bool> predicate = null);
     }
 }

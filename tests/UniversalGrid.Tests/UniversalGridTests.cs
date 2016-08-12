@@ -27,6 +27,68 @@ namespace UniversalGrid.Tests
         }
 
         [Test]
+        public void SetObject_TwoEqualObjects_ThrowsError()
+        {
+            var grid = new UniversalGrid<string>(3, 3);
+
+            var thing1 = "a".AsSpatialObject(1, 1);
+            var thing2 = "a".AsSpatialObject(1, 1);
+
+            grid.SetObject(thing1);
+
+            Assert.Throws<InvalidOperationException>(() => grid.SetObject(thing2));
+        }
+
+        [Test]
+        public void Clear_EmptyGrid_ReturnsFalse()
+        {
+            var grid = new UniversalGrid<string>(3, 3);
+            
+            var cleared = grid.Clear();
+
+            Assert.That(cleared, Is.False);
+        }
+
+        [Test]
+        public void Clear_SingleItem_ReturnsTrue()
+        {
+            var grid = new UniversalGrid<string>(3, 3);
+
+            var thing1 = "a".AsSpatialObject(1, 1);
+
+            grid.SetObject(thing1);
+
+            var cleared = grid.Clear();
+
+            Assert.That(cleared);
+        }
+
+        [Test]
+        public void Clear_TwoItems_UsingPredicate_ReturnsTrue()
+        {
+            var grid = new UniversalGrid<string>(3, 3);
+
+            var thing1 = "a".AsSpatialObject(1, 1);
+            var thing2 = "b".AsSpatialObject(2, 1);
+
+            grid.SetObject(thing1);
+            grid.SetObject(thing2);
+
+            bool removeFired = false;
+
+            grid.ItemRemoved += (s, e) =>
+            {
+                Assert.That(e.Target.Data, Is.EqualTo("a"));
+                removeFired = true;
+            };
+
+            var cleared = grid.Clear(x => x.Data == "a");
+
+            Assert.That(cleared);
+            Assert.That(removeFired);
+        }
+
+        [Test]
         public void SetObject_AtZero_FiredItemAddedAndModifiedEvent()
         {
             var grid = new UniversalGrid<string>(10, 20);
