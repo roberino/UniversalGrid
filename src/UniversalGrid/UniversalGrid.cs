@@ -439,6 +439,11 @@ namespace UniversalGrid
             {
                 IList<ISpatial2DThing<T>> items;
 
+                if (thing.Id != null && _items.SelectMany(i => i.Value).Any(x => string.Equals(thing.Id, x.Id)))
+                {
+                    throw new InvalidOperationException("Item ID already used within grid");
+                }
+
                 if (!_items.TryGetValue(thing.TopLeft, out items))
                 {
                     _items[thing.TopLeft] = items = new List<ISpatial2DThing<T>>();
@@ -508,13 +513,6 @@ namespace UniversalGrid
 
                 ev(this, new RuleViolationEvent(rule, thing));
             }
-
-            var actions = _actions.Values.Where(r => r.Condition(thing, e.Points)).ToList();
-
-            foreach (var action in actions)
-            {
-                action.RuleType.Invoke(this, thing);
-            }
         }
 
         private void ThingMovedEventHandler(object s, Point2DEventArgs e)
@@ -529,6 +527,13 @@ namespace UniversalGrid
         private void FireItemMoved(ISpatial2DThing<T> item)
         {
             if (_disableMoveEvents) return;
+
+            var actions = _actions.Values.Where(r => r.Condition(this, item.Positions)).ToList();
+
+            foreach (var action in actions)
+            {
+                action.RuleType.Invoke(this, item);
+            }
 
             var ev = ItemMoved;
 

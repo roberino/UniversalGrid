@@ -116,6 +116,21 @@ namespace UniversalGrid.Tests
             Assert.That(evFired);
         }
 
+
+
+        [Test]
+        public void SetObject_DuplicateId_ThrowsError()
+        {
+            var grid = new UniversalGrid<int>(10, 20);
+
+            var thing1 = (1).AsSpatialObject(1, 1, "a");
+            var thing2 = (2).AsSpatialObject(1, 2, "a");
+
+            grid.SetObject(thing1);
+
+            Assert.Throws<InvalidOperationException>(() => grid.SetObject(thing2));
+        }
+
         [Test]
         public void SetObjectThenMove_MovesWithinGrid()
         {
