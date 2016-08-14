@@ -60,8 +60,8 @@
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\src\UniversalGrid\UniversalGrid.csproj">
-      <Project>{94B7B576-F783-4F99-8C0D-3524E67613D1}</Project>
+    <ProjectReference Include="..\..\src\UniversalGrid\UniversalGrid.xproj">
+      <Project>{632c6d61-3414-4db4-877e-9d87d9309c9a}</Project>
       <Name>UniversalGrid</Name>
     </ProjectReference>
   </ItemGroup>

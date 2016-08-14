@@ -1,5 +1,4 @@
 ﻿using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 // General Information about an assembly is controlled through the following 
@@ -8,9 +7,8 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("UniversalGrid")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Euromoney Institutional Investor Plc")]
 [assembly: AssemblyProduct("UniversalGrid")]
-[assembly: AssemblyCopyright("Copyright © Euromoney Institutional Investor Plc 2016")]
+[assembly: AssemblyCopyright("Copyright © REyres")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -18,9 +16,6 @@ using System.Runtime.InteropServices;
 // to COM components.  If you need to access a type in this assembly from 
 // COM, set the ComVisible attribute to true on that type.
 [assembly: ComVisible(false)]
-
-// The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("94b7b576-f783-4f99-8c0d-3524e67613d1")]
 
 // Version information for an assembly consists of the following four values:
 //

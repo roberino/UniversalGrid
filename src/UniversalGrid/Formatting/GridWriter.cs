@@ -14,7 +14,7 @@
             var r = grid.TopLeft.Y - 1;
             var c = -1;
 
-            _textFormatter.WriteStartGrid();
+            _textFormatter.WriteStartGrid(grid);
 
             grid.Render((p, x) =>
             {
@@ -28,7 +28,7 @@
                     c = 0;
                 }
 
-                _textFormatter.WriteCell(c, x);
+                _textFormatter.WriteCell(p, c, x);
 
                 c++;
                 r = p.Y;    

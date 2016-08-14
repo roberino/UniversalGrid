@@ -129,5 +129,10 @@ namespace UniversalGrid.Geometry
         {
             return new Tuple<int, int, int, int>(Width, Height, TopLeft.X, TopLeft.Y).GetHashCode();
         }
+
+        public override string ToString()
+        {
+            return string.Format("{0} {1} {2} {3}", TopLeft.X, TopLeft.Y, BottomRight.X, BottomRight.Y);
+        }
     }
 }

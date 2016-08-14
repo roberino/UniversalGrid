@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using UniversalGrid.Drawing;
 using UniversalGrid.Events;
 
@@ -18,6 +19,11 @@ namespace UniversalGrid.Geometry
         /// Gets or sets the data
         /// </summary>
         T Data { get; set; }
+
+        /// <summary>
+        /// Annotates the object with an id
+        /// </summary>
+        string Id { get; }
 
         /// <summary>
         /// Annotates the object with a label
@@ -70,5 +76,10 @@ namespace UniversalGrid.Geometry
         /// <param name="origin">An optional origin (defaults to the RotationalCentre)</param>
         /// <param name="angle">An optional angle</param>
         bool Rotate(Point2D? origin = null, int angle = 90);
+
+        /// <summary>
+        /// Modifies the object's positions, by replacing with new positions
+        /// </summary>
+        bool Modify(IEnumerable<Point2D> newPosition);
     }
 }

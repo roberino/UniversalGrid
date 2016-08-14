@@ -13,13 +13,16 @@ namespace UniversalGrid
     /// Represents a 2 dimensional grid which can hold "spatial" objects
     /// </summary>
     /// <typeparam name="T">The type of spatial objects which the grid can contain</typeparam>
-    public class UniversalGrid<T> : Rectangle
+    public class UniversalGrid<T> : Rectangle, IGridContainer<T>
     {
         private readonly ReaderWriterLockSlim _rwLock;
         private readonly IDictionary<Point2D, IList<ISpatial2DThing<T>>> _items;
         private readonly IDictionary<int, ISpatialRule> _movementRules;
         private readonly IDictionary<int, RuleAction<UniversalGrid<T>>> _actions;
         private Rectangle _viewPort;
+        private double _unitWidth;
+        private double _unitHeight;
+        private bool _disableMoveEvents;
 
         /// <summary>
         /// Creates a new grid, at point (0,0)
@@ -33,6 +36,44 @@ namespace UniversalGrid
             _movementRules = new Dictionary<int, ISpatialRule>();
             _actions = new Dictionary<int, RuleAction<UniversalGrid<T>>>();
             _viewPort = new Rectangle(TopLeft, width, height);
+            _unitWidth = 1;
+            _unitHeight = 1;
+        }
+
+        /// <summary>
+        /// Gets or sets the width of 1 unit of space within the grid
+        /// </summary>
+        public double UnitWidth
+        {
+            get { return _unitWidth; }
+            set
+            {
+                Contract.Assert(value > 0);
+
+                if (_unitWidth != value)
+                {
+                    _unitWidth = value;
+                    FireModified();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the height of 1 unit of space within the grid
+        /// </summary>
+        public double UnitHeight
+        {
+            get { return _unitHeight; }
+            set
+            {
+                Contract.Assert(value > 0);
+
+                if (_unitHeight != value)
+                {
+                    _unitHeight = value;
+                    FireModified();
+                }
+            }
         }
 
         /// <summary>
@@ -127,13 +168,13 @@ namespace UniversalGrid
         }
 
         /// <summary>
-        /// Adds a rule which will be execute before an object is moved
+        /// Adds a constraint which will be executed before an object is moved
         /// </summary>
         /// <param name="condition">A predicate function which takes a 
         /// thing and a proposed move as arguments and returns a boolean value.
         /// The rule will fire (will be violated) if the condition returns true</param>
         /// <param name="id">An optional id assigned to the rul</param>
-        public ISpatialRule AddMovementRule(Func<ISpatial2D, IEnumerable<Point2D>, bool> condition)
+        public ISpatialRule AddConstraint(Func<ISpatial2D, IEnumerable<Point2D>, bool> condition)
         {
             ISpatialRule rule = null;
 
@@ -148,14 +189,14 @@ namespace UniversalGrid
         }
 
         /// <summary>
-        /// Adds a (type specific) rule which will be execute before an object is moved
+        /// Adds a (type specific) constraint which will be executed before an object is moved
         /// </summary>
         /// <param name="condition">A predicate function which takes a 
         /// thing and a proposed move as arguments and returns a boolean value.
         /// The rule will fire (will be violated) if the condition returns true</param>
         /// <param name="id">An optional id assigned to the rul</param>
         /// <param name="type">The type of rule</param>
-        public ISpatialRule AddMovementRule<R>(Func<ISpatial2D, IEnumerable<Point2D>, bool> condition, R type = default(R), int? id = null)
+        public ISpatialRule AddConstraint<R>(Func<ISpatial2D, IEnumerable<Point2D>, bool> condition, R type = default(R), int? id = null)
         {
             ISpatialRule rule = null;
 
@@ -212,7 +253,61 @@ namespace UniversalGrid
                 }
             });
 
+            if (moved) FireModified();
+
             return moved;
+        }
+
+        /// <summary>
+        /// Removes all items from the grid
+        /// </summary>
+        public bool Clear(Func<ISpatial2DThing<T>, bool> predicate = null)
+        {
+            bool hasPredicate = predicate != null;
+            bool itemsRemoved = false;
+
+            if (!hasPredicate)
+            {
+                predicate = (x) => true;
+            }
+
+            Write(() =>
+            {
+                if (_items.Count > 0)
+                {
+                    var toBeRemoved = _items.Values.SelectMany(v => v).Where(predicate).ToList();
+
+                    foreach (var thing in toBeRemoved)
+                    {
+                        thing.Moved -= ThingMovedEventHandler;
+                        thing.BeforeMoved -= ThingBeforeMovedEventHandler;
+
+                        if (hasPredicate)
+                        {
+                            var lists = _items.Values.Where(v => v.Contains(thing)).ToList();
+
+                            foreach (var list in lists)
+                            {
+                                list.Remove(thing);
+                            }
+                        }
+                    }
+
+                    if (!hasPredicate)
+                    {
+                        _items.Clear();
+                    }
+
+                    itemsRemoved = toBeRemoved.Count > 0;
+
+                    foreach (var item in toBeRemoved)
+                        FireItemRemoved(item);
+                }
+            });
+
+            if (itemsRemoved) FireModified();
+
+            return itemsRemoved;
         }
 
         /// <summary>
@@ -271,9 +366,7 @@ namespace UniversalGrid
         /// </summary>
         public void SetObjects(IEnumerable<ISpatial2DThing<T>> things)
         {
-            _rwLock.EnterWriteLock();
-
-            try
+            Write(() =>
             {
                 foreach (var t in things)
                 {
@@ -284,11 +377,7 @@ namespace UniversalGrid
                 {
                     SetObject(t, false);
                 }
-            }
-            finally
-            {
-                _rwLock.ExitWriteLock();
-            }
+            });
         }
 
         /// <summary>
@@ -318,9 +407,7 @@ namespace UniversalGrid
         {
             bool found = false;
 
-            _rwLock.EnterWriteLock();
-
-            try
+            Write(() =>
             {
                 var find = _items.Values.Select(v => new { list = v, items = v.Where(x => x.Equals(thing)).ToList() }).ToList();
 
@@ -331,23 +418,14 @@ namespace UniversalGrid
                         found |= affected.list.Remove(item);
                     }
                 }
-            }
-            finally
-            {
-                _rwLock.ExitWriteLock();
-            }
+            });
 
             thing.Moved -= ThingMovedEventHandler;
             thing.BeforeMoved -= ThingBeforeMovedEventHandler;
 
             if (found)
             {
-                var ev = ItemRemoved;
-
-                if (ev != null)
-                {
-                    ev.Invoke(this, new ObjectEvent<ISpatial2DThing<T>>(thing));
-                }
+                FireItemRemoved(thing);
 
                 FireModified();
             }
@@ -360,6 +438,11 @@ namespace UniversalGrid
             Write(() =>
             {
                 IList<ISpatial2DThing<T>> items;
+
+                if (thing.Id != null && _items.SelectMany(i => i.Value).Any(x => string.Equals(thing.Id, x.Id)))
+                {
+                    throw new InvalidOperationException("Item ID already used within grid");
+                }
 
                 if (!_items.TryGetValue(thing.TopLeft, out items))
                 {
@@ -430,13 +513,6 @@ namespace UniversalGrid
 
                 ev(this, new RuleViolationEvent(rule, thing));
             }
-
-            var actions = _actions.Values.Where(r => r.Condition(thing, e.Points)).ToList();
-
-            foreach (var action in actions)
-            {
-                action.RuleType.Invoke(this, thing);
-            }
         }
 
         private void ThingMovedEventHandler(object s, Point2DEventArgs e)
@@ -450,6 +526,15 @@ namespace UniversalGrid
 
         private void FireItemMoved(ISpatial2DThing<T> item)
         {
+            if (_disableMoveEvents) return;
+
+            var actions = _actions.Values.Where(r => r.Condition(this, item.Positions)).ToList();
+
+            foreach (var action in actions)
+            {
+                action.RuleType.Invoke(this, item);
+            }
+
             var ev = ItemMoved;
 
             if (ev != null)
@@ -458,6 +543,16 @@ namespace UniversalGrid
             }
 
             FireModified();
+        }
+
+        private void FireItemRemoved(ISpatial2DThing<T> thing)
+        {
+            var ev = ItemRemoved;
+
+            if (ev != null)
+            {
+                ev.Invoke(this, new ObjectEvent<ISpatial2DThing<T>>(thing));
+            }
         }
 
         private void FireModified()
@@ -484,9 +579,11 @@ namespace UniversalGrid
             }
         }
 
-        private void Write(Action operation)
+        private void Write(Action operation, bool moveEventsDisabled = false)
         {
             _rwLock.EnterWriteLock();
+
+            if (moveEventsDisabled) _disableMoveEvents = true;
 
             try
             {
@@ -494,6 +591,8 @@ namespace UniversalGrid
             }
             finally
             {
+                if (moveEventsDisabled) _disableMoveEvents = false;
+
                 _rwLock.ExitWriteLock();
             }
         }

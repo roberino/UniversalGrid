@@ -2,8 +2,21 @@
 
 namespace UniversalGrid.Geometry
 {
+    /// <summary>
+    /// Represents something which consumes space
+    /// </summary>
     public interface ISpatial2D
     {
+        /// <summary>
+        /// Gets the width of the object
+        /// </summary>
+        int Width { get; }
+
+        /// <summary>
+        /// Gets the height of the object
+        /// </summary>
+        int Height { get; }
+
         /// <summary>
         /// Returns the top left coordinate
         /// </summary>

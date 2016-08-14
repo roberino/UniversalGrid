@@ -1,4 +1,6 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
+using System.Xml.Linq;
 
 namespace UniversalGrid.Formatting
 {
@@ -17,6 +19,34 @@ namespace UniversalGrid.Formatting
                 grid.ToHtml(output, tableClass);
                 return output.ToString();
             }
+        }
+
+        public static XDocument ToXml<T>(this UniversalGrid<T> grid, Func<T, XNode> objectFormatter = null)
+        {
+            var doc = new XDocument();
+
+            using (var output = doc.CreateWriter())
+            {
+                var htmlFormatter = new XmlFormatter<T>(output, objectFormatter ?? (x => x == null ? null : new XText(x.ToString())));
+                var writer = new GridWriter<T>(htmlFormatter);
+                writer.Write(grid);
+            }
+
+            return doc;
+        }
+
+        public static XDocument ToSvg<T>(this UniversalGrid<T> grid, Func<T, XNode> objectFormatter = null)
+        {
+            var doc = new XDocument();
+
+            using (var output = doc.CreateWriter())
+            {
+                var htmlFormatter = new SvgFormatter<T>(output, objectFormatter ?? (x => x == null ? null : new XText(x.ToString())));
+                var writer = new GridWriter<T>(htmlFormatter);
+                writer.Write(grid);
+            }
+
+            return doc;
         }
 
         public static void ToHtml<T>(this UniversalGrid<T> grid, TextWriter output, string tableClass = null)
