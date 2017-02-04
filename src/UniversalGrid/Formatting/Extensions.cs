@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Xml.Linq;
+using UniversalGrid.Geometry;
 
 namespace UniversalGrid.Formatting
 {
@@ -41,10 +42,28 @@ namespace UniversalGrid.Formatting
 
             using (var output = doc.CreateWriter())
             {
-                var htmlFormatter = new SvgFormatter<T>(output, objectFormatter ?? (x => x == null ? null : new XText(x.ToString())));
-                var writer = new GridWriter<T>(htmlFormatter);
+                var svgFormatter = new SvgFormatter<T>(output, objectFormatter ?? (x => x == null ? null : new XText(x.ToString())));
+                var writer = new GridWriter<T>(svgFormatter);
                 writer.Write(grid);
             }
+
+            return doc;
+        }
+
+        public static XDocument ToSvg<T>(this UniversalGrid<T> grid, Rectangle viewBox, string className, Func<ISpatial2DThing<T>, XNode> objectFormatter)
+        {
+            var doc = new XDocument();
+
+            using (var output = doc.CreateWriter())
+            {
+                var svgFormatter = new SvgFormatter<T>(output, objectFormatter, className);
+                var writer = new GridWriter<T>(svgFormatter);
+                writer.Write(grid);
+            }
+
+            doc.Root.SetAttributeValue("height", viewBox.Height);
+            doc.Root.SetAttributeValue("width", viewBox.Width);
+            doc.Root.SetAttributeValue("viewBox", string.Format("{0} {1} {2} {3}", viewBox.TopLeft.X, viewBox.TopLeft.Y, viewBox.Width, viewBox.Height));
 
             return doc;
         }

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Xml.Linq;
 using UniversalGrid.Drawing;
 using UniversalGrid.Formatting;
+using UniversalGrid.Geometry;
 
 namespace UniversalGrid.Tests.Formatting
 {
@@ -60,6 +61,30 @@ namespace UniversalGrid.Tests.Formatting
             Assert.That(svgDoc.Root.Name.LocalName, Is.EqualTo("svg"));
 
             svgDoc.Save(@"C:\stash\grid.svg");
+
+            Console.WriteLine(svgDoc);
+        }
+
+        [Test]
+        public void ToSvg_SetsViewBox()
+        {
+            var grid = new UniversalGrid<string>(10, 15)
+            {
+                UnitHeight = 50,
+                UnitWidth = 50
+            };
+
+            var obj = grid.SetObject("X", 5, 5);
+
+            obj.Colour = new Colour() { R = 255, A = 255 };
+
+            var svgDoc = grid.ToSvg(new Rectangle(5, 4, 10, 15), "x", f => new XElement("circ", new XAttribute("cx", f.TopLeft.X)));
+
+            Assert.That(svgDoc.Root.Name.LocalName, Is.EqualTo("svg"));
+
+            Assert.That(svgDoc.Root.Attribute("viewBox").Value, Is.EqualTo("5 4 10 15"));
+            Assert.That(svgDoc.Root.Attribute("width").Value, Is.EqualTo("10"));
+            Assert.That(svgDoc.Root.Attribute("height").Value, Is.EqualTo("15"));
 
             Console.WriteLine(svgDoc);
         }

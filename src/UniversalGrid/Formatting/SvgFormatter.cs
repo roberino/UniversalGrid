@@ -22,7 +22,16 @@ namespace UniversalGrid.Formatting
             _unitHeight = 50;
             BorderStroke = Colour.Black;
         }
-        
+
+        public SvgFormatter(XmlWriter output, Func<ISpatial2DThing<T>, XNode> objectFormatter, string className) : base(output, objectFormatter)
+        {
+            _className = className;
+
+            _unitWidth = 50;
+            _unitHeight = 50;
+            BorderStroke = Colour.Black;
+        }
+
         public Colour BorderStroke { get; set; }
         public Colour CellFill { get; set; }
 
@@ -59,7 +68,7 @@ namespace UniversalGrid.Formatting
                     XmlWriter.WriteAttributeString("id", item.Id);
                 }
 
-                var itemNode = ObjectFormatter.Invoke(item.Data);
+                var itemNode = ObjectFormatter.Invoke(item);
 
                 foreach (var pos in item.Positions)
                 {
@@ -68,16 +77,23 @@ namespace UniversalGrid.Formatting
 
                 if (itemNode != null)
                 {
-                    var cent = item.RotationalCentre;
+                    if (itemNode is XText)
+                    {
+                        var cent = item.RotationalCentre;
 
-                    WriteStartElement("text");
+                        WriteStartElement("text");
 
-                    XmlWriter.WriteAttributeString("x", ((cent.X + 0.5) * _unitWidth).ToString());
-                    XmlWriter.WriteAttributeString("y", ((cent.Y + 0.5) * _unitHeight).ToString());
+                        XmlWriter.WriteAttributeString("x", ((cent.X + 0.5) * _unitWidth).ToString());
+                        XmlWriter.WriteAttributeString("y", ((cent.Y + 0.5) * _unitHeight).ToString());
 
-                    itemNode.WriteTo(XmlWriter);
+                        itemNode.WriteTo(XmlWriter);
 
-                    XmlWriter.WriteEndElement();
+                        XmlWriter.WriteEndElement();
+                    }
+                    else
+                    {
+                        itemNode.WriteTo(XmlWriter);
+                    }
                 }
 
                 XmlWriter.WriteEndElement();

@@ -1,5 +1,5 @@
 ﻿{
-  "version": "2.1.0-*",
+  "version": "2.2.2-beta",
   "title": "UniversalGrid",
   "description": "A simple, stand-alone library for managing objects within a 2 dimensional grid",
   "language": "en-GB",

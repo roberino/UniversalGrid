@@ -11,7 +11,7 @@ namespace UniversalGrid.Formatting
     public class XmlFormatter<T> : ITextFormatter<T>
     {
         private readonly XmlWriter _output;
-        private readonly Func<T, XNode> _objectFormatter;
+        private readonly Func<ISpatial2DThing<T>, XNode> _objectFormatter;
 
         bool _dataWritten;
         int _currentRow;
@@ -19,11 +19,18 @@ namespace UniversalGrid.Formatting
         public XmlFormatter(TextWriter output, Func<T, string> objectFormatter)
         {
             _output = XmlWriter.Create(output, new XmlWriterSettings());
-            _objectFormatter = (x => x == null ? null : new XText(x.ToString()));
+            _objectFormatter = (x => x == null ? null : new XText(x.Data.ToString()));
             EmptyCellContents = " ";
         }
 
         public XmlFormatter(XmlWriter output, Func<T, XNode> objectFormatter)
+        {
+            _output = output;
+            _objectFormatter = x => objectFormatter(x.Data);
+            EmptyCellContents = " ";
+        }
+
+        public XmlFormatter(XmlWriter output, Func<ISpatial2DThing<T>, XNode> objectFormatter)
         {
             _output = output;
             _objectFormatter = objectFormatter;
@@ -34,7 +41,7 @@ namespace UniversalGrid.Formatting
 
         protected XmlWriter XmlWriter { get { return _output; } }
 
-        protected Func<T, XNode> ObjectFormatter { get { return _objectFormatter; } }
+        protected Func<ISpatial2DThing<T>, XNode> ObjectFormatter { get { return _objectFormatter; } }
 
         protected int CurrentRowIndex { get { return _currentRow; } }
 
@@ -45,7 +52,7 @@ namespace UniversalGrid.Formatting
 
         protected virtual void WriteItem(ISpatial2DThing<T> item)
         {
-            var xnode = _objectFormatter.Invoke(item.Data);
+            var xnode = _objectFormatter.Invoke(item);
 
             if (xnode != null) xnode.WriteTo(_output);
         }
