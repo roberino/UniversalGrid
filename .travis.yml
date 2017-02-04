@@ -1,9 +1,7 @@
 language: csharp
-solution: UniversalGrid.sln
-install:
-  - mono .nuget/NuGet.exe restore UniversalGrid.sln
-# - nuget restore UniversalGrid.sln
-# - nuget install NUnit.ConsoleRunner -Version 3.6.0 -OutputDirectory build
+dist: trusty
+sudo: required
+mono: none
+dotnet: 1.0.0-preview2-003121
 script:
-  - xbuild /p:Configuration=Release UniversalGrid.sln
-  - mono ./build/NUnit.ConsoleRunner.3.6.0/tools/nunit3-console.exe ./tests/UniversalGrid.Tests/bin/Release/UniversalGrid.Tests.dll  --where "cat != BuildOmit"
+  - ./build.sh --quiet verify
