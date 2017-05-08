@@ -1,4 +1,4 @@
-﻿# Universal Grid
+﻿# Universal Grid 
 
 The UniversalGrid is a stand-alone library for managing objects within a 2 dimensional grid.
 
