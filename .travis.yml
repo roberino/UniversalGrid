@@ -4,5 +4,4 @@ sudo: required
 mono: none
 dotnet: 1.0.1
 script:
-  - chmod a+x ./build.sh
-  - ./build.sh verify
+  - dotnet restore -f netstandard1.6 src/**/project.json && dotnet build -f netstandard1.6 src/**/project.json
