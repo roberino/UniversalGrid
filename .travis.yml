@@ -4,4 +4,4 @@ sudo: required
 mono: none
 dotnet: 1.0.1
 script:
-  - dotnet restore -f netstandard1.6 src/**/project.json && dotnet build -f netstandard1.6 src/**/project.json
+  - dotnet restore netstandard1.6 src/**/project.json && dotnet build netstandard1.6 src/**/project.json
