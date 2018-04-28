@@ -59,8 +59,6 @@ namespace UniversalGrid.Tests.Formatting
 
             Assert.That(svgDoc.Root.Name.LocalName, Is.EqualTo("svg"));
 
-            svgDoc.Save(@"C:\stash\grid.svg");
-
             Console.WriteLine(svgDoc);
         }
 

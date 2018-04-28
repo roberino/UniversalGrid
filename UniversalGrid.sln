@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.27428.2037
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{CF796797-CE77-4B52-A38F-B1EB230EC0A4}"
 	ProjectSection(SolutionItems) = preProject
@@ -9,14 +9,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{CF796797-C
 		README.md = README.md
 	EndProjectSection
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "UniversalGrid", "src\UniversalGrid\UniversalGrid.xproj", "{632C6D61-3414-4DB4-877E-9D87D9309C9A}"
-EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "UniversalGrid.Tests", "tests\UniversalGrid.Tests\UniversalGrid.Tests.xproj", "{0C67F3B4-1F27-408E-BB42-621C6B42AEDF}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{8CE1C39C-BB24-451D-A6F7-27A1A2690DF6}"
-	ProjectSection(SolutionItems) = preProject
-		global.json = global.json
-	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UniversalGrid", "src\UniversalGrid\UniversalGrid.csproj", "{632C6D61-3414-4DB4-877E-9D87D9309C9A}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UniversalGrid.Tests", "tests\UniversalGrid.Tests\UniversalGrid.Tests.csproj", "{0C67F3B4-1F27-408E-BB42-621C6B42AEDF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -35,5 +32,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {8C9178FF-594A-4E74-B708-7EDC148FA493}
 	EndGlobalSection
 EndGlobal

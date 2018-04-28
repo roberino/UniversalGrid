@@ -1,85 +1,44 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{94B7B576-F783-4F99-8C0D-3524E67613D1}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>UniversalGrid</RootNamespace>
+    <Description>A simple, stand-alone library for managing objects within a 2 dimensional grid</Description>
+    <AssemblyTitle>UniversalGrid</AssemblyTitle>
+    <NeutralLanguage>en-GB</NeutralLanguage>
+    <VersionPrefix>2.1.0</VersionPrefix>
+    <Authors>R Eyres</Authors>
+    <TargetFrameworks>net45;net461;netstandard2.0</TargetFrameworks>
     <AssemblyName>UniversalGrid</AssemblyName>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
+    <PackageId>UniversalGrid</PackageId>
+    <PackageTags>grid collections cartesian coordinates spatial</PackageTags>
+    <PackageProjectUrl>https://github.com/roberino/UniversalGrid</PackageProjectUrl>
+    <PackageLicenseUrl>https://raw.githubusercontent.com/roberino/UniversalGrid/master/LICENSE</PackageLicenseUrl>
+    <RepositoryType>git</RepositoryType>
+    <RepositoryUrl>git://github.com/roberino/UniversalGrid</RepositoryUrl>
+    <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
+    <GenerateAssemblyDescriptionAttribute>false</GenerateAssemblyDescriptionAttribute>
+    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+    <GenerateAssemblyCopyrightAttribute>false</GenerateAssemblyCopyrightAttribute>
+    <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
+    <GenerateAssemblyFileVersionAttribute>false</GenerateAssemblyFileVersionAttribute>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Net.Http" />
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
     <Reference Include="System.Xml" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System" />
+    <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Formatting\Colour.cs" />
-    <Compile Include="Events\IEventDispatcher.cs" />
-    <Compile Include="Events\ObjectEvent.cs" />
-    <Compile Include="Formatting\Extensions.cs" />
-    <Compile Include="Formatting\FontStyle.cs" />
-    <Compile Include="Formatting\FormattableObject.cs" />
-    <Compile Include="Formatting\GridWriter.cs" />
-    <Compile Include="Formatting\CsvFormatter.cs" />
-    <Compile Include="Formatting\SvgFormatter.cs" />
-    <Compile Include="Formatting\XmlFormatter.cs" />
-    <Compile Include="Formatting\HtmlFormatter.cs" />
-    <Compile Include="Formatting\ITextFormatter.cs" />
-    <Compile Include="Geometry\Direction.cs" />
-    <Compile Include="Geometry\Extensions.cs" />
-    <Compile Include="Geometry\ISpatial2D.cs" />
-    <Compile Include="Geometry\ISpatial2DThing.cs" />
-    <Compile Include="Geometry\ISpatialContainer.cs" />
-    <Compile Include="Geometry\ObjectOutOfBoundsException.cs" />
-    <Compile Include="Geometry\Point2D.cs" />
-    <Compile Include="Geometry\Point2DEqualityComparer.cs" />
-    <Compile Include="Geometry\Point2DEventArgs.cs" />
-    <Compile Include="Geometry\Rectangle.cs" />
-    <Compile Include="Geometry\RoundingMethod.cs" />
-    <Compile Include="Geometry\Spatial2DThing.cs" />
-    <Compile Include="IGrid.cs" />
-    <Compile Include="IGridContainer.cs" />
-    <Compile Include="Rules\ISpatialRule.cs" />
-    <Compile Include="Rules\RuleAction.cs" />
-    <Compile Include="Rules\TypedSpatialRule.cs" />
-    <Compile Include="Rules\RuleViolationEvent.cs" />
-    <Compile Include="UniversalGrid.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net461' ">
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System" />
+    <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
+
+  <Target Name="PostcompileScript" AfterTargets="Build" Condition=" '$(IsCrossTargetingBuild)' != 'true' ">
+    <Exec Command="dotnet pack --no-build --configuration $(Configuration) --output ..\..\artifacts" />
   </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
+
 </Project>
